@@ -138,6 +138,9 @@ class TraineeNetwork:
             # Высчитваем и устанавиваем всем Тренеровачным Нейронам входыне и выходные значения
             self.LayerNeuron.CalculateSignal(itemSignal)
 
+            # Высчитывать Delta
+            # Коректировать Весса
+
             ReversIndexLayer: int = -1
             for Y, SelectTraineeNeuron in zip(self.LayerNeuron.CalculateSignal(itemSignal),
                                               self.Layer[ReversIndexLayer]):  # Выходной результат

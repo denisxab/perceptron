@@ -1,7 +1,7 @@
 import unittest
 
 from fun_active import FunActive
-from perceptron import LayerNeuron, LayerTraineeNeuron
+from perceptron import LayerNeuron, LayerTraineeNeuron, TraineeNetwork
 
 
 class Test_Perceptron(unittest.TestCase):
