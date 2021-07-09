@@ -1,5 +1,7 @@
 from typing import List
+
 from fun_active import FunActive
+
 
 #
 # class Dendrite:
@@ -15,5 +17,17 @@ from fun_active import FunActive
 
 class Neuron(FunActive):
     def __init__(self, arrLastWeight: List = None):
-        super().__init__()
         self.arrLastWeight = arrLastWeight
+
+
+class TraineeNeuron(FunActive):
+    def __init__(self,
+                 arrLastWeight: List = None,
+                 VInputSignal: float = None,
+                 Delta: float = None,
+                 FOutputSignal: float = None,
+                 ):
+        self.arrLastWeight = arrLastWeight
+        self.VInputSignal = VInputSignal
+        self.Delta = Delta
+        self.FOutputSignal = FOutputSignal
