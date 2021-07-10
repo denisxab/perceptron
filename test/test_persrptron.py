@@ -185,7 +185,7 @@ class Test_Perceptron(unittest.TestCase):
 
     def test_LayerTraineeNeuron(self):
         # Input
-        TmpLayer = LayerTraineeNeuron(CountInputDendrite=3, FunCalc=FunActive.Extremes)
+        TmpLayer = LayerTraineeNeuron(CountInputDendrite=3, FunCalc=FunActive.Extremes, DerivativeFun=None)
         # Hide 1
         TmpLayer.addCountNeuronInLayer(3)
         # Hide 2
@@ -201,7 +201,7 @@ class Test_Perceptron(unittest.TestCase):
     def test_LayerTraineeNeuron_CalculateSignal(self):
 
         # Input
-        TmpLayer = LayerTraineeNeuron(CountInputDendrite=3, FunCalc=FunActive.Extremes)
+        TmpLayer = LayerTraineeNeuron(CountInputDendrite=3, FunCalc=FunActive.Extremes, DerivativeFun=None)
         # Hide 1
         TmpLayer.addCountNeuronInLayer(3)
         # Hide 2
@@ -220,12 +220,13 @@ class Test_Perceptron(unittest.TestCase):
         ]
         TmpLayer.CalculateSignal(Signal)
         self.assertEqual(len(TmpLayer.CalculateSignal(Signal)), 2)
-        self.assertNotEqual(TmpLayer.Layer[0][0].VInputSignal, None)
+        self.assertNotEqual(type(TmpLayer.Layer[0][0].VInputSignal), int)
         self.assertNotEqual(TmpLayer.Layer[0][0].FOutputSignal, None)
 
     def test_Train(self):
         # Input
-        TmpLayer = LayerTraineeNeuron(CountInputDendrite=3, FunCalc=FunActive.Logistics)
+        TmpLayer = LayerTraineeNeuron(CountInputDendrite=3, FunCalc=FunActive.Logistics,
+                                      DerivativeFun=FunActive.LogisticsDerivative)
         # Hide 1
         TmpLayer.addCountNeuronInLayer(3)
         # Hide 2
@@ -250,7 +251,7 @@ class Test_Perceptron(unittest.TestCase):
         TmpLayer.TraineeBackPropagation(SignalList,
                                         RequiredList,
                                         ConvergenceStep=0.1,
-                                        DerivativeFun=FunActive.LogisticsDerivative)
+                                        Epochs=10)
 
 
 if __name__ == '__main__':

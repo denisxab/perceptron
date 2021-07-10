@@ -8,10 +8,7 @@ class FunActive:
     def sumDendrite(arrDendrite: List[float], arrInputSignal: List[float]) -> float:
         if len(arrDendrite) != len(arrInputSignal):
             raise IndexError("Колличество входных сиглалов привышает колличветсов в слое нейронов")
-        resSum: float = 0.0
-        for dendrite, signal in zip(arrDendrite, arrInputSignal):
-            resSum += dendrite * signal
-        return resSum
+        return sum(dendrite * signal for dendrite, signal in zip(arrDendrite, arrInputSignal))
 
     @staticmethod
     def Extremes(inPutSum: float) -> int:
