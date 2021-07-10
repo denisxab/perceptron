@@ -1,7 +1,7 @@
 import unittest
 
 from fun_active import FunActive
-from perceptron import LayerNeuron, LayerTraineeNeuron, TraineeNetwork
+from perceptron import LayerNeuron, LayerTraineeNeuron
 
 
 class Test_Perceptron(unittest.TestCase):
@@ -234,24 +234,23 @@ class Test_Perceptron(unittest.TestCase):
         TmpLayer.addCountNeuronInLayer(2)
 
         SignalList = [
-            1, 1, 1,
-            0, 0, 0,
-            1, 0, 1,
-            0, 1, 1,
+            [1, 1, 1],
+            [0, 0, 0],
+            [1, 0, 1],
+            [0, 1, 1]
         ]
 
         RequiredList = [
-            1,
-            0,
-            1,
-            0,
+            [1, 0],
+            [0, 1],
+            [1, 1],
+            [0, 0]
         ]
 
-        cls = TraineeNetwork(TmpLayer)
-        cls.TraineeBackPropagation(SignalList,
-                                   RequiredList,
-                                   ConvergenceStep=0.1,
-                                   DerivativeFun=FunActive.LogisticsDerivative)
+        TmpLayer.TraineeBackPropagation(SignalList,
+                                        RequiredList,
+                                        ConvergenceStep=0.1,
+                                        DerivativeFun=FunActive.LogisticsDerivative)
 
 
 if __name__ == '__main__':

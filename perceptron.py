@@ -117,38 +117,71 @@ class LayerTraineeNeuron(Layer):
             selectSignal = tmpSignal
         return selectSignal
 
-
-class TraineeNetwork:
-    def __init__(self, ObjectLayerNeuron: LayerTraineeNeuron):
-        self.LayerNeuron = ObjectLayerNeuron
-
-    def TraineeBackPropagation(self, signalList: List[List[int]], requiredValueList: List[int], *,
-                               ConvergenceStep: float,  # L
+    def TraineeBackPropagation(self, signalList: List[List[int]], requiredValueList: List[List[int]], *,
+                               ConvergenceStep: float,  # L 0.1 .. 0.001
                                DerivativeFun: Union[
                                    FunActive.LogisticsDerivative,
                                    FunActive.HyperbolicTangentDerivative
                                ]  # D
                                ):
 
+        # Проверка того что колличетсво входных сигланов и колличетсов нужных ответов совподают по длинне
         if len(signalList) != len(requiredValueList):
             raise IndexError()
 
-        for itemSignal, itemRequired in zip(signalList, requiredValueList):  # +
+        # Провекра того что Массив с нужными ответами соответсвует по длинне с колличеством выходных нейронов
+        if len(requiredValueList) != len(self.Layer[-1]):
+            raise IndexError()
 
-            # Высчитваем и устанавиваем всем Тренеровачным Нейронам входыне и выходные значения
-            self.LayerNeuron.CalculateSignal(itemSignal)
+        # Тестовый счетсчик
+        Count: float = 1
 
+        for itemSignal, itemRequired in zip(signalList, requiredValueList):
+            """
+            W = Веса меняються независимо
+            Delta = меняться только когда известны все нейроны
+            """
+            # Кратектеровка весов выходного слоя #
+            IndexRequired: int = 0  # Ошибка выходного нейрона должна высчитываться для каждого нужного результата
+            for N, Y in zip(self.Layer[-1], self.CalculateSignal(itemSignal)):
+                E = Y - itemRequired[IndexRequired]  # Ошибка выходного нейрона
+                N.Delta = E * DerivativeFun(N.VInputSignal)  # Вычисляем локальыней градиент для выходного нейронеа
+                # Коректируем веса у выходного нейрона
+                for index, W in enumerate(N.arrLastWeight):
+                    N.arrLastWeight[
+                        index] = Count  # W - (ConvergenceStep * N.Delta * self.Layer[-2][index].FOutputSignal)
+                    Count += 1
+                IndexRequired += 1
+
+            # Кратектеровка весов скрытого слоя #
+            for indexLayer in range(-2, -self.CountLayer, -1):
+                for index2, N2 in enumerate(self.Layer[indexLayer]):
+                    Q: float = 0.0
+                    for x in self.Layer[-1]:
+                        Q += x.Delta * x.arrLastWeight[index2]
+                    N2.Delta = Q * DerivativeFun(N2.VInputSignal)
+                    # Коректируем веса
+                    for index, W in enumerate(N2.arrLastWeight):
+                        N2.arrLastWeight[index] = W - (
+                                ConvergenceStep * N2.Delta * self.Layer[-2][index].FOutputSignal)
+            # Вычисляем локальыней градиент для нейронов скрытого слоя
+            #
+            # for N in self.Layer[-2]:
+            #     N.Delta = Q * DerivativeFun(N.VInputSignal)
+            #     # Устанавливаем локальынй градиент для нового сктырого слоя
+            #     self.Layer[-2][index].Delta = N.Delta * W * self.Layer[-2][index].VInputSignal
             # Высчитывать Delta
-            # Коректировать Весса
-
-            ReversIndexLayer: int = -1
-            for Y, SelectTraineeNeuron in zip(self.LayerNeuron.CalculateSignal(itemSignal),
-                                              self.Layer[ReversIndexLayer]):  # Выходной результат
-                E = Y - itemRequired  # Ошибка выходного нейрона
-                SelectTraineeNeuron.Delta = E * DerivativeFun(SelectTraineeNeuron.outPut)
-                for selectDendrite in SelectTraineeNeuron.arrLastNeuron:
-                    selectDendrite.weight = selectDendrite.weight - (
-                            ConvergenceStep * SelectTraineeNeuron.Delta * selectDendrite.neuron.outPut)
+            #
+            # # Коректировать Весса
+            #
+            # ReversIndexLayer: int = -1
+            # for Y, SelectTraineeNeuron in zip(self.LayerNeuron.CalculateSignal(itemSignal),
+            #                                   self.Layer[ReversIndexLayer]):  # Выходной результат
+            #     E = Y - itemRequired  # Ошибка выходного нейрона
+            #     SelectTraineeNeuron.Delta = E * DerivativeFun(SelectTraineeNeuron.outPut)
+            #     for selectDendrite in SelectTraineeNeuron.arrLastNeuron:
+            #         selectDendrite.weight = selectDendrite.weight - (
+            #                 ConvergenceStep * SelectTraineeNeuron.Delta * selectDendrite.neuron.outPut)
 
 
 if __name__ == '__main__':
