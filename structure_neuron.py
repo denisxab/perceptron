@@ -20,7 +20,11 @@ class Neuron(FunActive):
         self.arrLastWeight = arrLastWeight
 
 
+Tid: int = 0
+
+
 class TraineeNeuron(FunActive):
+
     def __init__(self,
                  arrLastWeight: List = None,
                  VInputSignal: float = None,
@@ -31,3 +35,9 @@ class TraineeNeuron(FunActive):
         self.VInputSignal = VInputSignal
         self.Delta = Delta
         self.FOutputSignal = FOutputSignal
+        global Tid
+        self.id = str(Tid)
+        Tid += 1
+
+    def __repr__(self) -> str:
+        return self.id

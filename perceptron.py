@@ -124,7 +124,7 @@ class LayerTraineeNeuron(Layer):
         return selectSignal
 
     def TraineeBackPropagation(self, signalList: List[List[int]], requiredValueList: List[List[int]], *,
-                               ConvergenceStep: float, Epochs: int
+                               ConvergenceStep: float, Epochs: int, StopSum: float
                                ):
         """
         :param signalList: Массив с входными сигналами
@@ -146,38 +146,44 @@ class LayerTraineeNeuron(Layer):
         W = Веса меняються независимо
         Delta = Зависима и меняться только когда известны все W и Delta на преидущем слое
         """
+        SumE: float = 0.0
+        for indexEpoch in range(Epochs):
 
-        # Тестовый счетсчик
-        Count: float = 1
-        for itemSignal, itemRequired in zip(signalList, requiredValueList):
+            for itemSignal, itemRequired in zip(signalList, requiredValueList):
 
-            # Кратектеровка весов и усатвновка Delta дял нейронов выходного слоя #
-            IndexRequired: int = 0  # Индекс для связи Номера ответа нейрона и Требуемого ответа для этого нйерона
-            for N, Y in zip(self.Layer[-1], self.CalculateSignal(itemSignal)):
-                E = Y - itemRequired[IndexRequired]  # Ошибка для нейрона выходного слоя
-                N.Delta = E * self.DerivativeFun(
-                    N.VInputSignal)  # Вычисляем локальыней градиент для нейрона выходного нейронеа
-                # Коректировка весов у нейрона выходного нейрона
-                for index, W in enumerate(N.arrLastWeight):
-                    N.arrLastWeight[
-                        index] = Count  # W - (ConvergenceStep * N.Delta * self.Layer[-2][index].FOutputSignal)
-                    Count += 1
-                IndexRequired += 1
+                # Кратектеровка весов и усатвновка Delta дял нейронов выходного слоя #
+                IndexRequired: int = 0  # Индекс для связи Номера ответа нейрона и Требуемого ответа для этого нйерона
+                for N, Y in zip(self.Layer[-1], self.CalculateSignal(itemSignal)):
+                    E = Y - itemRequired[IndexRequired]  # Ошибка для нейрона выходного слоя
+                    SumE += E  # Общая сумма ошибки сети - нужня для статистики
+                    N.Delta = E * self.DerivativeFun(
+                        N.VInputSignal)  # Вычисляем локальыней градиент для нейрона выходного нейронеа
+                    # Коректировка весов у нейрона выходного нейрона
+                    for index, W in enumerate(N.arrLastWeight):
+                        N.arrLastWeight[
+                            index] = W - (ConvergenceStep * N.Delta * self.Layer[-2][index].FOutputSignal)
+                    IndexRequired += 1
 
-            del E, IndexRequired, Y, W, N, index
-            # Навигация по слоям, начало от пердвыходного слоя до входного слоя
-            for indexLayer in range(-2, -self.CountLayer, -1):
-                # Кратектеровка весов и установка Delta для нейронов скрытого и входного слоя#
-                for index2, N2 in enumerate(self.Layer[indexLayer]):
-                    # Суммирования градиентов локальных ошибок
-                    Q = sum(x.Delta * x.arrLastWeight[index2] for x in self.Layer[-1])
+                del E, IndexRequired, Y, W, N, index
+                # Навигация по слоям, начало от пердвыходного слоя до входного слоя
+                for indexLayer in range(-2, -self.CountLayer, -1):
+                    # Кратектеровка весов и установка Delta для нейронов скрытого и входного слоя#
+                    for index2, N2 in enumerate(self.Layer[indexLayer]):
+                        # Суммирования градиентов локальных ошибок
+                        Q = sum(x.Delta * x.arrLastWeight[indexLayer + 1] for x in self.Layer[-1])
 
-                    N2.Delta = Q * self.DerivativeFun(N2.VInputSignal)
-                    # Коректируем веса
-                    for index, W in enumerate(N2.arrLastWeight):
-                        N2.arrLastWeight[
-                            index] = Count  # W - (ConvergenceStep * N2.Delta * self.Layer[-2][index].FOutputSignal)
-                        Count += 1
+                        N2.Delta = Q * self.DerivativeFun(N2.VInputSignal)
+                        # Коректируем веса
+                        for index, W in enumerate(N2.arrLastWeight):
+                            N2.arrLastWeight[
+                                index] = W - (
+                                    ConvergenceStep * N2.Delta * self.Layer[indexLayer - 1][index].FOutputSignal)
+
+            print(f"{indexEpoch}:\t\t{SumE}")
+            if SumE < 0.0:
+                break
+            SumE = 0.0
+
             # Вычисляем локальыней градиент для нейронов скрытого слоя
             #
             # for N in self.Layer[-2]:

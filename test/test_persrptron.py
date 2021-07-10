@@ -174,7 +174,7 @@ class Test_Perceptron(unittest.TestCase):
 
         # Проверка подсчета
         self.assertEqual(TmpLayer.CalculateSignal(Signal)[0], 1)
-        # Проверка обравботки ошибки при работе CheckLen
+        # Проверка обработки ошибки при работе CheckLen
         self.assertRaises(IndexError, TmpLayer.addNeuronInLayer,
                           [[0.5,
                             -0.5,
@@ -224,34 +224,71 @@ class Test_Perceptron(unittest.TestCase):
         self.assertNotEqual(TmpLayer.Layer[0][0].FOutputSignal, None)
 
     def test_Train(self):
+
+        # # Hide 1
+        # TmpLayer.addCountNeuronInLayer(3)
+        # # Hide 2
+        # TmpLayer.addCountNeuronInLayer(2)
+        # # Output
+        # TmpLayer.addCountNeuronInLayer(2)
+
+        # SignalList = [
+        #     [1, 1, 1],
+        #     [0, 0, 0],
+        # ]
+
+        # RequiredList = [[1], [0]]
+        # RequiredList = [
+        #     [1, 0],
+        #     [0, 1],
+        # ]
+
+        # # Проверка подсчета
+        # self.assertEqual(TmpLayer.CalculateSignal(Signal)[0], 1)
+
+        t = [
+            1,  # Хорошая погода
+            1,  # Ветер
+            0  # Дождь
+        ]
+
+        SignalList = [
+            [1, 1, 0],
+            [1, 0, 0],
+            [0, 0, 0],
+
+            [0, 1, 0],
+            [0, 0, 1],
+            [0, 1, 1],
+
+        ]
+        RequiredList = [
+            [1],
+            [1],
+            [1],
+
+            [0],
+            [0],
+            [0],
+        ]
+
         # Input
         TmpLayer = LayerTraineeNeuron(CountInputDendrite=3, FunCalc=FunActive.Logistics,
                                       DerivativeFun=FunActive.LogisticsDerivative)
-        # Hide 1
-        TmpLayer.addCountNeuronInLayer(3)
-        # Hide 2
+
         TmpLayer.addCountNeuronInLayer(2)
-        # Output
-        TmpLayer.addCountNeuronInLayer(2)
+        TmpLayer.addCountNeuronInLayer(1)
 
-        SignalList = [
-            [1, 1, 1],
-            [0, 0, 0],
-            [1, 0, 1],
-            [0, 1, 1]
-        ]
-
-        RequiredList = [
-            [1, 0],
-            [0, 1],
-            [1, 1],
-            [0, 0]
-        ]
-
+        # Обучение
         TmpLayer.TraineeBackPropagation(SignalList,
                                         RequiredList,
-                                        ConvergenceStep=0.1,
-                                        Epochs=10)
+                                        ConvergenceStep=0.01,
+                                        Epochs=10,StopSum=0.01)
+        print("*" * 40)
+        for s, r in zip(SignalList, RequiredList):
+            print(f"{s} : {TmpLayer.CalculateSignal(s)} : {r}")
+
+        print()
 
 
 if __name__ == '__main__':
