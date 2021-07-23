@@ -98,7 +98,8 @@ class LayerTraineeNeuron(Layer):
     def addCountNeuronInLayer(self, countNeuronInLayer: int):  # +
         tmpArrNeuron: List[TraineeNeuron] = []
         for item in range(countNeuronInLayer):
-            tmpArrWeight: List[float] = [random.uniform(-0.5, 0.5) for _ in self.Layer[-1]]
+            tmpArrWeight: List[float] = [0 for _ in self.Layer[-1]]
+            # [random.uniform(-0.5, 0.5) for _ in self.Layer[-1]]
             tmpArrNeuron.append(TraineeNeuron(arrLastWeight=tmpArrWeight))
 
         self.Layer.append(tmpArrNeuron)
@@ -148,9 +149,7 @@ class LayerTraineeNeuron(Layer):
         """
         SumE: float = 0.0
         for indexEpoch in range(Epochs):
-
             for itemSignal, itemRequired in zip(signalList, requiredValueList):
-
                 # Кратектеровка весов и усатвновка Delta дял нейронов выходного слоя #
                 IndexRequired: int = 0  # Индекс для связи Номера ответа нейрона и Требуемого ответа для этого нйерона
                 for N, Y in zip(self.Layer[-1], self.CalculateSignal(itemSignal)):

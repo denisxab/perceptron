@@ -6,21 +6,20 @@ class FunActive:
 
     @staticmethod
     def sumDendrite(arrDendrite: List[float], arrInputSignal: List[float]) -> float:
-        if len(arrDendrite) != len(arrInputSignal):
+        try:
+            return sum(dendrite * signal for dendrite, signal in zip(arrDendrite, arrInputSignal))
+        except IndexError:
             raise IndexError("Колличество входных сиглалов привышает колличветсов в слое нейронов")
-        return sum(dendrite * signal for dendrite, signal in zip(arrDendrite, arrInputSignal))
 
     @staticmethod
     def Extremes(inPutSum: float) -> int:
-        outPut = 1 if inPutSum >= 0.5 else 0
-        return outPut
+        return 1 if inPutSum >= 0.5 else 0
 
     ################################
     @staticmethod
     def Logistics(inPutSum: float) -> float:
         # -10 ... 1
-        outPut = 1 / (1 + pow(math.e, -inPutSum))
-        return outPut
+        return 1 / (1 + pow(math.e, -inPutSum))
 
     @staticmethod
     def LogisticsDerivative(outPut: float) -> float:
@@ -30,9 +29,8 @@ class FunActive:
     @staticmethod
     def HyperbolicTangent(inPutSum: float) -> float:
         # -1 ... 1
-        outPut = (pow(math.e, inPutSum) - pow(math.e, -inPutSum)) / (
+        return (pow(math.e, inPutSum) - pow(math.e, -inPutSum)) / (
                 pow(math.e, inPutSum) + pow(math.e, -inPutSum))
-        return outPut
 
     @staticmethod
     def HyperbolicTangentDerivative(outPut: float) -> float:
